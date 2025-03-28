@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -11,6 +12,8 @@ import (
 )
 
 const LISTEN_ADDRESS = ":9999"
+const ENABLE_WEBSOCKET bool = true
+const ENABLE_ONESHOT bool = true
 
 // How often should we update the info? this doesn't tell you how long it's
 // going to take to update the information; that depends on the system calls. It
@@ -118,8 +121,50 @@ func websocketEndpointHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func oneshotHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Got oneshot request")
+	defer log.Println("Finished handling oneshot request")
+
+	s, err := getStats()
+	if err != nil {
+		log.Println(err)
+
+		w.WriteHeader(http.StatusInternalServerError)
+		if _, err := w.Write([]byte("Unable to get usage metrics")); err != nil {
+			log.Println("Unable to write HTTP error response")
+		}
+
+		return
+	}
+
+	j, err := json.Marshal(s)
+	if err != nil {
+		log.Println(err)
+
+		w.WriteHeader(http.StatusInternalServerError)
+		if _, err := w.Write([]byte("Unable to stringify metrics")); err != nil {
+			log.Println("Unable to write HTTP error response")
+		}
+
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write(j); err != nil {
+		log.Println(err)
+
+		return
+	}
+}
+
 func main() {
-	http.HandleFunc("/", websocketEndpointHandler)
+	if ENABLE_WEBSOCKET {
+		http.HandleFunc("/", websocketEndpointHandler)
+	}
+
+	if ENABLE_ONESHOT {
+		http.HandleFunc("/oneshot", oneshotHandler)
+	}
 
 	log.Fatal(http.ListenAndServe(LISTEN_ADDRESS, nil))
 }
