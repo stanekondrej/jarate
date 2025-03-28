@@ -1,8 +1,11 @@
 # jarate - a system usage daemon-viewer-thingamajig
 
+_I'm not a script kiddie, Dad; I'm a sysadmin! Well, the difference being: one
+is a job, and the other's mental sickness!_
+
 ## Why the name?
 
-I don't know. I like sniper. And I like TF2.
+sniper tf2 jarate
 
 ## How do I use this?
 
@@ -37,3 +40,12 @@ The response is formatted as JSON, with the following structure:
   }
 }
 ```
+
+## More customizations?
+
+`jarate --help` should be enough to answer that question.
+
+-----
+
+`Be polite. Be efficient. Have a plan to monitor the performance of every piece
+of metal you come across.`
