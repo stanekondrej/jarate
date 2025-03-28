@@ -6,27 +6,22 @@ import (
 )
 
 type cpuStats struct {
-	Overall float64   `json:"overall"`
-	PerCore []float64 `json:"per_core"`
-	Freq    uint      `json:"freq"`
+	PerCpu []float64 `json:"per_cpu"`
+	//Freq   uint      `json:"freq"`
 }
 
 func getCpuStats() (cpuStats, error) {
-	perCore, err := cpu.Percent(0, false)
-	if err != nil {
-		return cpuStats{}, err
-	}
-	overall, err := cpu.Percent(0, true)
+	perCpu, err := cpu.Percent(0, false)
 	if err != nil {
 		return cpuStats{}, err
 	}
 
-	freq := cpu.ClocksPerSec / 1_000_000
+	// WARN: in the package, this is just hard-coded to 100. wtf.
+	//freq := cpu.ClocksPerSec / 1_000_000
 
 	return cpuStats{
-		overall[0],
-		perCore,
-		uint(freq),
+		perCpu,
+		//uint(freq),
 	}, nil
 }
 

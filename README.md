@@ -25,17 +25,12 @@ The response is formatted as JSON, with the following structure:
 ```jsonc
 {
   "cpu": {
-    "overall": 10.1231,
-    "per_core": [
-      10.192,
-      14.832,
-      83.1928392,
-      19.41203122
+    "per_cpu": [
+      14.432              // You probably only have a single CPU
     ],
-    "freq": 2600 // in MHz
   },
-  "mem": { // in bytes
-    "used": 7000000000, // 7_000_000_000 (7GB)
+  "mem": {                // in bytes
+    "used": 7000000000,   // 7_000_000_000 (7GB)
     "total": 16000000000
   }
 }
