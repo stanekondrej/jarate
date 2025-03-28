@@ -1,0 +1,37 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Make build directory
+      run: mkdir -p build/
+
+    - name: Build for native
+      run: go build -o build/native cmd/jarate/main.go
+
+    - name: Build for arm64 (rpi)
+      run: |
+        chmod +x build_rpi.sh
+        ./build_rpi.sh
+
+## no tests yet
+#    - name: Test
+#      run: go test -v ./...
