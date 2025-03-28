@@ -88,36 +88,38 @@ func getStats() (Stats, error) {
 	}, nil
 }
 
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("New WS client")
+func websocketEndpointHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("New WS client")
 
-		conn, err := upgrader.Upgrade(w, r, nil)
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer conn.Close()
+
+	log.Println("Client connected")
+	defer log.Println("Client disconnected")
+
+	for {
+		s, err := getStats()
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		defer conn.Close()
 
-		log.Println("Client connected")
-		defer log.Println("Client disconnected")
-
-		for {
-			s, err := getStats()
-			if err != nil {
-				log.Println(err)
-				return
-			}
-
-			err = conn.WriteJSON(s)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-
-			time.Sleep(UPDATE_INTERVAL)
+		err = conn.WriteJSON(s)
+		if err != nil {
+			log.Println(err)
+			return
 		}
-	})
+
+		time.Sleep(UPDATE_INTERVAL)
+	}
+}
+
+func main() {
+	http.HandleFunc("/", websocketEndpointHandler)
 
 	log.Fatal(http.ListenAndServe(LISTEN_ADDRESS, nil))
 }
