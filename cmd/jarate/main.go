@@ -158,6 +158,10 @@ func oneshotHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	if !ENABLE_WEBSOCKET && !ENABLE_ONESHOT {
+		log.Fatal("No handler enabled, exiting")
+	}
+
 	if ENABLE_WEBSOCKET {
 		http.HandleFunc("/", websocketEndpointHandler)
 	}
