@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"log"
 	"net/http"
 	"time"
@@ -11,14 +12,21 @@ import (
 	"github.com/shirou/gopsutil/v4/mem"
 )
 
-const LISTEN_ADDRESS = ":9999"
-const ENABLE_WEBSOCKET bool = true
-const ENABLE_ONESHOT bool = true
+var (
+	updateInterval = flag.Duration("interval", time.Second, "Update interval (only applies to WS)")
+
+	enableWebsocket   = flag.Bool("websocket", true, "Enable the websocket endpoint")
+	websocketEndpoint = flag.String("ws-endpoint", "/", `The websocket endpoint path`)
+
+	enableOneshot   = flag.Bool("oneshot", true, "Enable the oneshot HTTP endpoint")
+	oneshotEndpoint = flag.String("oneshot-endpoint", "/oneshot", `The oneshot endpoint path`)
+
+	listenAddress = flag.String("listen", ":9999", `Address and port to listen on`)
+)
 
 // How often should we update the info? this doesn't tell you how long it's
 // going to take to update the information; that depends on the system calls. It
 // is, however, the minimum time that passes between updates.
-const UPDATE_INTERVAL = time.Millisecond * 1000
 const BUFFER_SIZE = 1024
 
 var upgrader = websocket.Upgrader{
@@ -117,7 +125,7 @@ func websocketEndpointHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		time.Sleep(UPDATE_INTERVAL)
+		time.Sleep(*updateInterval)
 	}
 }
 
@@ -158,17 +166,19 @@ func oneshotHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	if !ENABLE_WEBSOCKET && !ENABLE_ONESHOT {
+	flag.Parse()
+
+	if !*enableOneshot && !*enableWebsocket {
 		log.Fatal("No handler enabled, exiting")
 	}
 
-	if ENABLE_WEBSOCKET {
-		http.HandleFunc("/", websocketEndpointHandler)
+	if *enableWebsocket {
+		http.HandleFunc(*oneshotEndpoint, oneshotHandler)
 	}
 
-	if ENABLE_ONESHOT {
-		http.HandleFunc("/oneshot", oneshotHandler)
+	if *enableWebsocket {
+		http.HandleFunc(*websocketEndpoint, websocketEndpointHandler)
 	}
 
-	log.Fatal(http.ListenAndServe(LISTEN_ADDRESS, nil))
+	log.Fatal(http.ListenAndServe(*listenAddress, nil))
 }
