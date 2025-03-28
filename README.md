@@ -1,5 +1,6 @@
-![Go](https://github.com/stanekondrej/jarate/actions/workflows/go.yml/badge.svg)](https://github.com/stanekondrej/jarate/actions/workflows/go.yml)
 # jarate - a system usage daemon-viewer-thingamajig
+
+[![Go](https://github.com/stanekondrej/jarate/actions/workflows/go.yml/badge.svg)](https://github.com/stanekondrej/jarate/actions/workflows/go.yml)
 
 _I'm not a script kiddie, Dad; I'm a sysadmin! Well, the difference being: one
 is a job, and the other's mental sickness!_
